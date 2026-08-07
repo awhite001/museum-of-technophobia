@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Exhibit Not Found | The Museum of Technophobia</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,900;1,9..144,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  /* Self-contained: the 404 can be served at any path depth, so it
+     carries its own styles instead of linking /style.css. */
+  :root {
+    --bg: #141110; --bg-deep: #0d0b0a; --ink: #eae2d3; --ink-dim: #a89e8b;
+    --ink-faint: #6e6659; --brass: #c9a227; --brass-dim: #8f7620;
+    --blood: #c05038; --hairline: rgba(234, 226, 211, 0.14);
+    --serif: "Fraunces", Georgia, "Times New Roman", serif;
+    --mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: var(--bg); color: var(--ink); font-family: var(--serif); line-height: 1.65; }
+  .grain {
+    position: fixed; inset: 0; z-index: 40; pointer-events: none; opacity: 0.05;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+</style>
+<style>
+  .lost {
+    min-height: 100svh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 24px;
+  }
+  .lost .code {
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    color: var(--blood);
+    margin-bottom: 24px;
+  }
+  .lost h1 {
+    font-size: clamp(2.4rem, 7vw, 4.5rem);
+    font-weight: 900;
+    line-height: 1.02;
+    max-width: 14em;
+    text-wrap: balance;
+  }
+  .lost p {
+    max-width: 34em;
+    margin-top: 24px;
+    color: var(--ink-dim);
+    font-style: italic;
+  }
+  .lost a.back {
+    display: inline-block;
+    margin-top: 40px;
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.26em;
+    text-transform: uppercase;
+    color: var(--brass);
+    border: 1.5px solid var(--brass-dim);
+    padding: 14px 30px 13px;
+    text-decoration: none;
+    transition: background 0.2s, color 0.2s;
+  }
+  .lost a.back:hover { background: var(--brass); color: var(--bg-deep); }
+</style>
+</head>
+<body>
+<div class="grain" aria-hidden="true"></div>
+<main class="lost">
+  <p class="code">Error 404 &mdash; Exhibit not found</p>
+  <h1>This wing was destroyed by Luddites in 1811.</h1>
+  <p>They were quite thorough. The frames were smashed, the page was lost, and the
+  museum has been meaning to rebuild ever since. Whatever you were looking for, it
+  is not here &mdash; which, the management notes, is precisely what the Luddites
+  intended.</p>
+  <a class="back" href="/" id="back-link">Return to the collection</a>
+</main>
+<script>
+  /* On GitHub Pages the site lives under /<repo>/, so "/" would exit the museum. */
+  if (location.hostname.endsWith("github.io")) {
+    var seg = location.pathname.split("/")[1];
+    if (seg) document.getElementById("back-link").href = "/" + seg + "/";
+  }
+</script>
+</body>
+</html>

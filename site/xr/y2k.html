@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Y2K Bunker — Diorama XIII | The Museum of Technophobia</title>
+<meta name="description" content="Stand in a fallout bunker at 11:59 PM on December 31, 1999, resume history, and see what midnight does. A WebXR diorama from the Museum of Technophobia — VR optional, nerve required.">
+<link rel="canonical" href="https://technophobic.space/xr/y2k.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="The Museum of Technophobia">
+<meta property="og:title" content="The Y2K Bunker — a walk-in exhibit">
+<meta property="og:description" content="11:59 PM, December 31, 1999. Click the television. Brace as needed.">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,900;1,9..144,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="diorama.css">
+<script type="importmap">
+{
+  "imports": {
+    "three": "./lib/three.module.min.js",
+    "three/addons/": "./lib/addons/"
+  }
+}
+</script>
+</head>
+<body>
+
+<div id="stage"></div>
+
+<header id="plaque">
+  <span class="p-num">Diorama XIII</span>
+  <h1>The Y2K Bunker</h1>
+  <span class="p-sub">11:59 PM &middot; December 31, 1999</span>
+</header>
+
+<a id="back" href="../index.html#ex-13">&larr; The collection</a>
+
+<div id="hint" role="status" aria-live="polite"></div>
+
+<button id="vr-btn" type="button" hidden>Enter VR</button>
+
+<div id="card" aria-live="polite"></div>
+
+<div id="veil"><span>Excavating the bunker&hellip;</span></div>
+
+<script type="module" src="scenes/y2k.js"></script>
+</body>
+</html>

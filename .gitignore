@@ -1,0 +1,10 @@
+.DS_Store
+
+# Local Blender working material — NOT published: contains scans of
+# copyrighted/trademarked art (movie poster, food label, newspaper page).
+# Swap for original pastiche textures before un-ignoring anything here.
+models/
+site/xr/scenes/y2k-poster-test.glb
+site/xr/scenes/y2k.glb
+*.blend
+*.blend1

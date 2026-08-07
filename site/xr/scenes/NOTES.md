@@ -92,3 +92,31 @@ go dark and the whole joke dies. So:
 2. Click the TV → countdown runs → blackout is actually dark → lights return
 3. Cans clink, wheel spins, lamp sways
 4. File size sane (Network tab), first paint under a few seconds
+
+---
+
+## Scene 2: The Print Shop (press.js / press.glb)
+
+Same pipeline as the bunker: drop `press.glb` in this folder to replace the
+whole procedural set (full-set swap, same warning as above). Export the
+current set from the console with `__press.exportGLB()`.
+
+Reserved names for the press scene:
+
+| Name           | What the code does with it                                  |
+|----------------|-------------------------------------------------------------|
+| `press`        | Click target (whole group) — triggers the pull              |
+| `press_hitbox` | Invisible generous click zone (keep or replace)             |
+| `press_lever`  | Rotated on Y during the pull — pivot at the screw axis      |
+| `press_platen` | Translated down/up 0.1m during the pull                     |
+| `candle`       | Code attaches the flickering point light here; clickable    |
+| `ink_balls`    | Clickable (squish + hint)                                   |
+| `type_case`    | Clickable (rattle + hint)                                   |
+| `pile_point`   | Empty/locator: printed sheets stack at its world position   |
+
+Printed sheets are spawned by code with canvas textures (the headlines) —
+they are not part of the GLB. Keep `press_lever`'s origin at the screw axis
+and `press_platen`'s origin at its rest position, or the animation will
+orbit strangely. The lever rests swung toward the viewer (rotation.y ≈ 1.15
+in the procedural set); the code animates relative to whatever rest pose it
+finds.

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Railway Platform — Diorama IV | The Museum of Technophobia</title>
+<meta name="description" content="Stand on a gas-lit platform in 1866, pull the signal lever, and let the 11:42 through at a medically inadvisable thirty miles per hour. A WebXR diorama from the Museum of Technophobia — VR optional, spine required.">
+<link rel="canonical" href="https://technophobic.space/xr/railway.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="The Museum of Technophobia">
+<meta property="og:title" content="The Railway Platform — a walk-in exhibit">
+<meta property="og:description" content="Coldfield Halt, 1866. Pull the signal. Hold your nerve.">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,900;1,9..144,400&family=IBM+Plex+Mono:wght@400;500&family=Playfair+Display:wght@900&family=UnifrakturCook:wght@700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="diorama.css">
+<script type="importmap">
+{
+  "imports": {
+    "three": "./lib/three.module.min.js",
+    "three/addons/": "./lib/addons/"
+  }
+}
+</script>
+</head>
+<body>
+
+<div id="stage"></div>
+
+<header id="plaque">
+  <span class="p-num">Diorama IV</span>
+  <h1>The Railway Platform</h1>
+  <span class="p-sub">Coldfield Halt &middot; 11:42 PM, 1866</span>
+</header>
+
+<a id="back" href="../index.html#ex-04">&larr; The collection</a>
+
+<div id="hint" role="status" aria-live="polite"></div>
+
+<button id="vr-btn" type="button" hidden>Enter VR</button>
+
+<div id="card" aria-live="polite"></div>
+
+<div id="veil"><span>Waiting for the fog&hellip;</span></div>
+
+<script type="module" src="scenes/railway.js"></script>
+</body>
+</html>

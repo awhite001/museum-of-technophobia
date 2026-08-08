@@ -60,6 +60,16 @@ export function createDiorama(opts) {
   controls.maxPolarAngle = cam.maxPolar ?? 1.52;
   if (cam.minAzimuth !== undefined) controls.minAzimuthAngle = cam.minAzimuth;
   if (cam.maxAzimuth !== undefined) controls.maxAzimuthAngle = cam.maxAzimuth;
+
+  /* Narrow viewports (portrait windows, phones) crop horizontally, which
+     guts wide sets. Dolly back once at load so the framing survives. */
+  const aspect = window.innerWidth / window.innerHeight;
+  const dolly = Math.min(Math.max(0.95 / aspect, 1), 1.3);
+  if (dolly > 1) {
+    const back = camera.position.clone().sub(controls.target).multiplyScalar(dolly);
+    camera.position.copy(controls.target).add(back);
+    controls.maxDistance *= dolly;
+  }
   controls.update();
 
   /* ---------- click routing (desktop, touch, and VR trigger) ---------- */

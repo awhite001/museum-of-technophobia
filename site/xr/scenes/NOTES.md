@@ -120,3 +120,33 @@ and `press_platen`'s origin at its rest position, or the animation will
 orbit strangely. The lever rests swung toward the viewer (rotation.y ≈ 1.15
 in the procedural set); the code animates relative to whatever rest pose it
 finds.
+
+---
+
+## Scene 3: The Railway Platform (railway.js / railway.glb)
+
+Same pipeline. Export the current set with `__railway.exportGLB()`, drop
+`railway.glb` here to replace it wholesale.
+
+Reserved names:
+
+| Name                | What the code does with it                                    |
+|---------------------|---------------------------------------------------------------|
+| `signal_lever`      | Click target (whole group) — summons the 11:42                |
+| `signal_lever_arm`  | Rotated on X when pulled — pivot at the lever's quadrant hub   |
+| `semaphore_arm`     | Rotated on Z (arm drops to clear) — pivot at the post          |
+| `gas_lamp`          | Code parents the flickering point light here; clickable        |
+| `bench`             | Clickable (hint only)                                          |
+| `train`             | **Moved by code** along world X at 13.4 m/s, hidden when idle  |
+| `platform`, `station_wall`, `station_sign`, `poster_caution`, `plinth` | Scenery — rework freely |
+
+The train is the unusual one: the code sets `train.position` every frame
+during a pass, so build it as a single group whose origin is at the
+locomotive's centre, facing +X travel, sitting on the rails (z ≈ 0.95). Its
+headlight is a code-owned PointLight parented at the smokebox. Everything in
+the group rides along — add carriages, a tender, whatever you like.
+
+**Lighting note, same principle as the bunker:** the gas lamp and the
+headlight are live and animated (flicker, approach). Bake AO and bounce, not
+direct light, or the train will pass through an unlit set. Preview lights in
+the .blend are stripped on load.

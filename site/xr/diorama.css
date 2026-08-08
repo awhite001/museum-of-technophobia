@@ -170,6 +170,8 @@ html, body {
 #veil.lifted { opacity: 0; pointer-events: none; }
 
 @media (max-width: 640px) {
-  #plaque { top: 12px; left: 12px; padding: 10px 14px 9px; }
-  #back { top: 12px; right: 12px; padding: 8px 12px; }
+  #plaque { top: 12px; left: 12px; padding: 10px 14px 9px; max-width: 56vw; }
+  #plaque h1 { font-size: 1.15rem; }
+  #plaque .p-sub { font-size: 9.5px; }
+  #back { top: 12px; right: 12px; padding: 8px 11px; font-size: 10px; letter-spacing: 0.1em; }
 }

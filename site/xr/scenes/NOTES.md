@@ -150,3 +150,46 @@ the group rides along — add carriages, a tender, whatever you like.
 headlight are live and animated (flicker, approach). Bake AO and bounce, not
 direct light, or the train will pass through an unlit set. Preview lights in
 the .blend are stripped on load.
+
+---
+
+## Scene 4: The Schoolyard Bonfire (bonfire.js / bonfire.glb)
+
+Export with `__bonfire.exportGLB()`, drop `bonfire.glb` here to replace it.
+
+Reserved names:
+
+| Name                  | What the code does with it                                   |
+|-----------------------|--------------------------------------------------------------|
+| `comic_stack`         | Click target — throws the top comic on the fire               |
+| `comic_01` … `comic_NN` | The throwable pile. **Count and order matter**: they map 1:1 onto the title/price list in `bonfire.js`, thrown from the highest number down |
+| `fire_pit`            | Locator: the fire's world position (flames, light, embers)    |
+| `fire_flames`         | Group of flame meshes the code scales/sways per frame         |
+| `wertham_book`        | Clickable (hint only)                                         |
+| `poster_notice`       | Clickable (hint only)                                         |
+| `ground`, `school_wall`, `crate`, `comic_stray`, `plinth` | Scenery — rework freely |
+
+Add or remove comics by editing the `COMICS` array in `bonfire.js` to match
+the meshes you ship; a mesh with no matching entry is simply never thrown.
+
+**Fire is code-owned.** The flame cones, the flickering point light and the
+ember particles are all built and animated in code around `fire_pit` — model
+the stones, logs and ash bed, but don't model flames; they'd sit inert inside
+the live ones.
+
+---
+
+## Gotchas worth remembering (learned the hard way)
+
+- **Never let `material.opacity` exceed 1.** Three.js draws *nothing* rather
+  than clamping. Clamp every fade curve.
+- **Avoid `depthTest: false`** on transparent materials — on some GPUs the
+  draw is silently dropped. Use `renderOrder` plus `depthWrite: false`.
+- **Use `THREE.Sprite` for billboards** rather than a plane you `lookAt`
+  each frame; it is simpler and behaves in VR.
+- **Deep containers shadow their own contents.** A crate or box with tall
+  walls will swallow whatever you put in it under firelight — keep rims low
+  or let the contents crest above them.
+- **Hard-refresh after every edit.** ES modules, CSS and GLBs all cache
+  aggressively on a plain static server; a normal reload often serves stale
+  code and you will debug a file the browser isn't running.

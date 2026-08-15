@@ -467,6 +467,54 @@ createDiorama({
 
     const find = (name) => root.getObjectByName(name) || null;
 
+    /* ---------- baked-lighting mode ----------
+       A Cycles Combined bake already carries the whole light rig inside its
+       textures. Those meshes must be drawn UNLIT, or three.js lights them a
+       second time and the bake turns to mud. Mark such a set by adding an
+       Empty named LIGHTING_BAKED in Blender; ?baked=1 / ?baked=0 overrides
+       it for a quick A/B in the browser. */
+    const qs = new URLSearchParams(location.search);
+    let baked = !!find("LIGHTING_BAKED");
+    if (qs.has("baked")) baked = qs.get("baked") !== "0";
+
+    const bakedMats = [];
+    if (baked && usedGLB) {
+      root.traverse((o) => {
+        if (!o.isMesh || o.name === "crt_screen") return;
+        const list = Array.isArray(o.material) ? o.material : [o.material];
+        const unlit = list.map((m) => {
+          if (!m) return m;
+          const b = new THREE.MeshBasicMaterial({
+            map: m.map || null,
+            /* untextured materials keep their own colour, so a half-baked
+               set still reads as a room instead of a white void */
+            color: m.map ? 0xffffff : (m.color ? m.color.clone() : 0xffffff),
+            transparent: m.transparent,
+            opacity: m.opacity,
+            alphaTest: m.alphaTest,
+            side: m.side,
+          });
+          b.userData.baseColor = b.color.clone();
+          bakedMats.push(b);
+          return b;
+        });
+        o.material = Array.isArray(o.material) ? unlit : unlit[0];
+        o.castShadow = false;
+        o.receiveShadow = false;
+      });
+      console.info(
+        "Bunker: baked lighting — " + bakedMats.length + " materials drawn unlit."
+      );
+    }
+
+    /* With the room's light living in one texture, dimming it is a single
+       global multiply — which is precisely what midnight is. */
+    function setBakedLevel(k) {
+      if (!bakedMats.length) return;
+      const c = Math.max(0, k);
+      for (const m of bakedMats) m.color.copy(m.userData.baseColor).multiplyScalar(c);
+    }
+
     /* ---------- house lights (always code-owned) ---------- */
     const hemi = new THREE.HemisphereLight(0x2a2a33, 0x0b0a09, 0.32);
     scene.add(hemi);
@@ -690,6 +738,7 @@ createDiorama({
       crtGlow.intensity = 0;
       bounce.intensity = 0;
       scene.environmentIntensity = 0; /* the dark has to be genuinely dark */
+      setBakedLevel(0);               /* ...including a baked set */
       redraw();
       setHint("");
     }
@@ -720,6 +769,7 @@ createDiorama({
       bulbLight.intensity = 32;
       bounce.intensity = 5;
       scene.environmentIntensity = 0.4;
+      setBakedLevel(1);
       if (bulb && bulb.material && bulb.material.emissive) bulb.material.emissiveIntensity = 2.4;
       setHint("Drag to look around. Click the television.");
     }
@@ -801,7 +851,9 @@ createDiorama({
       tick(dt, t) {
         state.blink = (state.blink + dt) % 1;
 
-        if (lamp && !reducedMotion) {
+        /* a baked set has its shadows painted on: swinging the lamp would
+           slide the fixture out from under its own light pool */
+        if (lamp && !reducedMotion && !baked) {
           const sway = 0.018 + lampImpulse;
           lamp.rotation.z = Math.sin(t * 1.7) * sway;
           lamp.rotation.x = Math.cos(t * 1.3) * sway * 0.6;
@@ -840,6 +892,9 @@ createDiorama({
               bulbLight.intensity +=
                 (baseLamp - bulbLight.intensity) * Math.min(1, dt * 8);
             }
+            /* one bulb lighting one room: scaling the bake is a fair
+               approximation of that bulb losing its nerve */
+            setBakedLevel(bulbLight.intensity / baseLamp);
           }
 
           if (state.countdown <= 0) midnight();
@@ -862,6 +917,7 @@ createDiorama({
           crtGlow.intensity = baseGlow * back;
           bounce.intensity = baseBounce * back * flicker;
           scene.environmentIntensity = baseEnv * back;
+          setBakedLevel(back * flicker);
         }
 
         state.redrawAcc += dt;

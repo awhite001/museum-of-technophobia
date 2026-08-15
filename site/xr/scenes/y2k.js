@@ -10,7 +10,7 @@
 import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { GLTFExporter } from "three/addons/exporters/GLTFExporter.js";
-import { createDiorama, reducedMotion } from "../diorama.js";
+import { createDiorama, createEnvironment, reducedMotion } from "../diorama.js";
 import * as sfx from "../audio.js";
 
 /* ---------- palette ---------- */
@@ -476,6 +476,20 @@ createDiorama({
     scene.add(fill);
     scene.add(fill.target);
 
+    /* soft indirect light: lifts the black side of everything, and gives a
+       baked occlusion map something to actually occlude */
+    const museumEnv = createEnvironment(ctx.renderer, {
+      top: "#4a4336", mid: "#2b2721", bottom: "#12100e",
+    });
+    scene.environment = museumEnv;
+    scene.environmentIntensity = 0.4;
+
+    /* bounce off the concrete floor — cheap stand-in for radiosity, and the
+       single biggest cure for shadows that read as black holes */
+    const bounce = new THREE.PointLight(0xffc287, 5, 5, 2);
+    bounce.position.set(0, 0.3, -0.5);
+    scene.add(bounce);
+
     const lamp = find("lamp");
     const bulb = find("lamp_bulb");
     const bulbLight = new THREE.PointLight(0xffd9a4, 32, 0, 2);
@@ -674,6 +688,8 @@ createDiorama({
       hemi.intensity = 0.02;
       fill.intensity = 0;
       crtGlow.intensity = 0;
+      bounce.intensity = 0;
+      scene.environmentIntensity = 0; /* the dark has to be genuinely dark */
       redraw();
       setHint("");
     }
@@ -697,6 +713,14 @@ createDiorama({
       state.mode = "idle";
       state.countdown = 15;
       if (hum) { hum.setLevel(0, 0.5); hum.setNoise(0, 0.5); }
+      /* restore anything the blackout zeroed, in case of an early rewind */
+      hemi.intensity = 0.32;
+      fill.intensity = 26;
+      crtGlow.intensity = 1.6;
+      bulbLight.intensity = 32;
+      bounce.intensity = 5;
+      scene.environmentIntensity = 0.4;
+      if (bulb && bulb.material && bulb.material.emissive) bulb.material.emissiveIntensity = 2.4;
       setHint("Drag to look around. Click the television.");
     }
 
@@ -736,7 +760,32 @@ createDiorama({
         );
       });
     }
-    window.__bunker = { arm, state, exportGLB, usedGLB };
+    /* Flat, even light for judging a bake — kills the hot key light and
+       floods the room from the environment, so baked albedo and occlusion
+       can be read on their own terms. __bunker.inspect(false) to go back. */
+    let inspecting = false;
+    let inspectEnv = null;
+    function inspect(on = !inspecting) {
+      inspecting = on;
+      if (on && !inspectEnv) {
+        /* a bright neutral studio dome — the museum's own environment is
+           deliberately near-black, so scaling it up only yields dim brown */
+        inspectEnv = createEnvironment(ctx.renderer, {
+          top: "#ffffff", mid: "#e2e2e2", bottom: "#a8a8a8",
+        });
+      }
+      scene.environment = on ? inspectEnv : museumEnv;
+      scene.environmentIntensity = on ? 1.5 : 0.4;
+      hemi.intensity = on ? 1.2 : 0.32;
+      bulbLight.intensity = on ? 6 : 32;
+      fill.intensity = on ? 8 : 26;
+      bounce.intensity = on ? 0 : 5;
+      return on
+        ? "inspection lighting on — flat studio dome, for reading baked maps"
+        : "museum lighting restored";
+    }
+
+    window.__bunker = { arm, state, exportGLB, usedGLB, inspect, scene };
 
     /* ============================================================
        tick
@@ -745,6 +794,8 @@ createDiorama({
     const baseHemi = 0.32;
     const baseFill = 26;
     const baseGlow = 1.6;
+    const baseBounce = 5;
+    const baseEnv = 0.4;
 
     return {
       tick(dt, t) {
@@ -809,6 +860,8 @@ createDiorama({
           hemi.intensity = baseHemi * back;
           fill.intensity = baseFill * back;
           crtGlow.intensity = baseGlow * back;
+          bounce.intensity = baseBounce * back * flicker;
+          scene.environmentIntensity = baseEnv * back;
         }
 
         state.redrawAcc += dt;

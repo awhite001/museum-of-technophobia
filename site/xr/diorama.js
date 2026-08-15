@@ -9,6 +9,39 @@ import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 export const reducedMotion =
   window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
+/* A soft procedural environment (IBL) built from a gradient — no HDR file.
+   Two reasons every diorama wants one:
+     1. it fills the black side of every surface, so shadows read as shadow
+        rather than as holes;
+     2. three.js applies an aoMap ONLY to *indirect* light. A scene lit purely
+        by point and spot lights has no indirect light at all, so a baked
+        occlusion map would be mathematically invisible. This gives it
+        something to occlude. */
+export function createEnvironment(renderer, opts = {}) {
+  const {
+    top = "#3c4149", mid = "#23252b", bottom = "#141210",
+  } = opts;
+  const c = document.createElement("canvas");
+  c.width = 64; c.height = 32;
+  const g = c.getContext("2d");
+  const grad = g.createLinearGradient(0, 0, 0, 32);
+  grad.addColorStop(0, top);
+  grad.addColorStop(0.55, mid);
+  grad.addColorStop(1, bottom);
+  g.fillStyle = grad;
+  g.fillRect(0, 0, 64, 32);
+
+  const tex = new THREE.CanvasTexture(c);
+  tex.mapping = THREE.EquirectangularReflectionMapping;
+  tex.colorSpace = THREE.SRGBColorSpace;
+
+  const pmrem = new THREE.PMREMGenerator(renderer);
+  const rt = pmrem.fromEquirectangular(tex);
+  pmrem.dispose();
+  tex.dispose();
+  return rt.texture;
+}
+
 export function createDiorama(opts) {
   const host = document.getElementById("stage");
   const veil = document.getElementById("veil");
